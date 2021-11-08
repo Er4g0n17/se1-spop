@@ -13,7 +13,7 @@ that is responsible of the CLI used to interact with the software.
 
 import random as rd
 
-
+# Class for cards, a card as a name, a type(offensive or defensive), health_effect, status_effect and the text which the decription of the card.
 class Card:
 
     def __init__(self, name, type, health_effect, status_effect, text):
@@ -24,6 +24,11 @@ class Card:
         self.text = text
 
 
+    def describeCard(self):
+        print(f' --- The card {self.name} is a {self.type}. --- \n --- {self.text} ---')
+# Class for a deck, a deck is composed of offensive_cards, defensive_cards and has a max card.
+# It also contains the deck which is a list and isShuffled.
+# There are the functions createDeck, shuffleDeck and printDeck
 class Deck:
     
     def __init__(self, offensive_cards, defensive_cards, max_cards=20):
@@ -57,14 +62,18 @@ class Deck:
         for card in self.deck:
             print(n, card.name)
             n += 1
+        
+    def showDeck(self):
+        pass
 
-
+# Class CardUser is the class for player and enemies. A card user has a hand, a deck, health_points and a status.
+# There are the functions showStatus which shows the health and the status and useCard that has 
 class CardUser:
 
-    def __init__(self, hand, deck, health_points, status):
-        self.hand = hand
-        self.deck = deck
-        self.health_points = health_points
+    def __init__(self):
+        self.hand = []
+        self.deck = []
+        self.health_points = 20
     
     def showStatus(self):
         pass
@@ -72,85 +81,126 @@ class CardUser:
     def useCard(self, card, target):
         pass
 
+    def applyCardEffect(self, card, target):
+        pass
+    
+    def removeCardFromHand(self, card):
+        pass
 
+
+# Class Player inherits from CardUser, however here with have a set health_points value
 class Player(CardUser):
+    
+    def __init__(self, health_points = 20):
+        super().__init__()
+        self.health_points = health_points
+    
+    def giveDeck(self, deck):
+        self.deck = deck
+
     pass
 
 
-
+# Class Enemy inherist from CardUser
 class Enemy(CardUser):
     pass
 
+
+class Admin:
+    pass
+
+
+# Class Game will take care of the interactions of the user.
 class Game:
 
     def __init__(self):
-        pass
-    pass
 
-offensive_cards_dic = {
-    0: Card("FireBall", "offensive", -5, "burn", "Inflict 5 damages to the targeted entity"),
-    1: Card("Ice Spike", "offensive", -3, "freeze", "Inflict 3 damage to targeted entity") 
-}
-
-defensive_cards_dic = {
-    0: Card("Heal", "defensive", +5, None, "Heal 5 health points to target"),
-    1: Card("Block", "defensive", 6, "prevent", "Prevent next turn damage")
-}
-
-
-""" fireball = Card("FireBall", "offensive", -5, "burn", "Inflict 5 damages to the targeted entity")
-ice_spike =  Card("Ice Spike", "offensive", -3, "freeze", "Inflict 3 damage to targeted entity")
-heal = Card("Heal", "defensive", +5, None, "Heal 5 health points to target")
-block = Card("Block", "defensive", 6, "prevent", "Prevent next turn damage")
-
-
-
-deck = Deck([fireball, ice_spike], [heal, block])
-deck.createDeck()
-deck.shuffleDeck()
-deck.printDeck()
-"""
-def main():
-    quit = False
-    isDeckCreated = False
-    isDeckShuffled = False
-    isGameStarted = False
-    
-    print("--- Welcome in the SPOP of Gabriel S.J. Spadoni ---")
-    print("--- Type help to display the available commands and their description ---")
-
-    while not quit:
+        self.player = None
+        self.enemies = []
+        self.current_floor = 0
+        self.isGameStarted = False
         
+        self.quit = False
+        self.isDeckCreated = False
+        self.isDeckShuffle = False
+        self.isGameStarted = False
+        self.commands = dict()
+
+        self.offensive_cards_dic = {
+            0: Card("FireBall", "offensive", -5, "burn", "Inflict 5 damages to the targeted entity"),
+            1: Card("Ice Spike", "offensive", -3, "freeze", "Inflict 3 damage to targeted entity"),
+            2: Card("Burn", "offensive", 0, "burn", "Inflict burning effect to the target") 
+        }
+
+        self.defensive_cards_dic = {
+            0: Card("Heal", "defensive", +5, None, "Heal 5 health points to target"),
+            1: Card("Block", "defensive", 6, "prevent", "Prevent next turn damage")
+        }
+
+
+    # Add a command manager with commands dic. To have a single function that manages 
+    def main(self):
+        
+        
+        print("--- Welcome in the SPOP of Gabriel S.J. Spadoni ---")
+        print("--- Type help to display the available commands and their description ---")
+        print("--- Enter your user type ---")
+
         command = input("--- Type your command --- ")
 
-        if command == 'quit':
-            quit = True
-        elif command == 'help':
-            print("--- Commands are: ---")
-            print("--- createDeck: creates a deck of random cards taken from the card pool ---")
-            print("--- showDeck: shows the cards in the deck --- ")
-            print("--- shuffleDeck: shuffles the deck --- ")
-            print("--- quit: quit the software --- ")
-        elif command == 'createDeck':
-            deck = Deck(offensive_cards_dic, defensive_cards_dic)
-            deck.createDeck()
-            print("--- Deck Created! --- ")
-            isDeckCreated = True
-        elif command == 'showDeck':
-            if isDeckCreated:
-                print("--- Deck contains --- ")
-                deck.printDeck()
+        if command == 'player':
+            player = Player()
+
+        while not self.quit:
+            
+            command = input("--- Type your command --- ")
+
+            command = command.split(' ')
+
+
+            if command[0] == 'quit':
+                self.quit = True
+            elif command[0] == 'help':
+                print("--- Commands are: ---")
+                print("--- createDeck: creates a deck of random cards taken from the card pool ---")
+                print("--- showDeck: shows the cards in the deck --- ")
+                print("--- shuffleDeck: shuffles the deck --- ")
+                print("--- quit: quit the software --- ")
+            elif command[0] == 'createDeck':
+                deck = Deck(self.offensive_cards_dic, self.defensive_cards_dic)
+                deck.createDeck()
+                print("--- Deck Created! --- ")
+                self.isDeckCreated = True
+            elif command[0] == 'showDeck':
+                if self.isDeckCreated:
+                    print("--- Deck contains --- ")
+                    deck.printDeck()
+                else:
+                    print('--- Deck not created! --- ')
+            elif command[0] == 'shuffleDeck':
+                if self.isDeckCreated:
+                    deck.shuffleDeck()
+                    self.isDeckShuffled = True
+                    print('--- Deck succesfuly shuffled! --- ')
+                else:
+                    print('--- Deck not created! --- ')
+            elif command[0] == 'startGame':
+                if self.isDeckCreated and self.isDeckShuffled:
+                    player.giveDeck(deck)
+                    print('--- The game has started! --- ')
+                    self.isGameStarted = True
+                else:
+                    print("--- Game can't be started ---")
             else:
-                print('--- Deck not created! --- ')
-        elif command == 'shuffleDeck':
-            if isDeckCreated:
-                deck.shuffleDeck()
-                isDeckShuffled = True
-                print('--- Deck succesfuly shuffled! --- ')
-            else:
-                print('--- Deck not created! --- ')
-        else:
-            print("--- Unknown Command. Try again! --- ")
+                print("--- Unknown Command. Try again! --- ")
             
 
-main()
+    
+
+    def startFight(self, player, enemy):
+        pass
+    
+
+game = Game()
+
+game.main()
