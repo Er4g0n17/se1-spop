@@ -49,7 +49,7 @@ class Deck:
         for _ in range(n_offensive_cards):
             card = self.offensive_cards[rd.randint(0, len(self.offensive_cards) - 1)]
             self.deck.append(card)
-        for card in range(n_defensive_cards):
+        for _ in range(n_defensive_cards):
             card = self.defensive_cards[rd.randint(0, len(self.defensive_cards) - 1)]
             self.deck.append(card)
 
@@ -75,6 +75,7 @@ class CardUser:
         self.hand = []
         self.deck = []
         self.health_points = 20
+        self.status_effect = None
     
     def showStatus(self):
         pass
@@ -119,7 +120,6 @@ class Game:
         self.player = None
         self.enemies = []
         self.current_floor = 0
-        self.isGameStarted = False
         
         self.quit = False
         self.isDeckCreated = False
@@ -137,7 +137,8 @@ class Game:
 
         self.defensive_cards_dic = {
             0: Card("Heal", "defensive", +5, None, "Heal 5 health points to target"),
-            1: Card("Block", "defensive", 6, "prevent", "Prevent next turn damage")
+            1: Card("Block", "defensive", 6, "prevent", "Prevent next turn damage"),
+            2: Card("Blessing", "defensive", 0, "bless", "Next healing will be doubled")
         }
 
 
@@ -202,13 +203,23 @@ class Game:
                     self.isGameStarted = True
                 else:
                     print("--- Game can't be started ---")
+            elif command[0] == 'describeCard':
+                try: 
+                    asked_card_name = command[1]
+                    set_of_cards = set(deck.deck)
+                    
+                except:
+                    print("--- no card given ---")
             else:
                 print("--- Unknown Command. Try again! --- ")
             
 
     
-
+    
     def startFight(self, player, enemy):
+        pass
+
+    def processTurn(self): #possibility will modidy the RAD, as it introduces further concept of turn.
         pass
     
 
