@@ -14,7 +14,7 @@ that is responsible of the CLI used to interact with the software.
 import random as rd
 
 # Class for cards, a card as a name, a type(offensive or defensive), health_effect, status_effect and the text which the decription of the card.
-class Card:
+class ctCard:
 
     def __init__(self, name, type, health_effect, status_effect, text):
         self.name = name
@@ -24,13 +24,13 @@ class Card:
         self.text = text
 
 
-    def describeCard(self):
+    def oeDescribeCard(self):
         print(f' --- The card {self.name} is a {self.type}. --- \n --- {self.text} ---')
 
 # Class for a deck, a deck is composed of offensive_cards, defensive_cards and has a max card.
 # It also contains the deck which is a list and isShuffled.
 # There are the functions createDeck, shuffleDeck and printDeck
-class Deck:
+class ctDeck:
     
     def __init__(self, offensive_cards, defensive_cards, max_cards=20):
         self.offensive_cards = offensive_cards
@@ -40,7 +40,7 @@ class Deck:
         self.max_cards = max_cards
         self.isShuffled = False
 
-    def createDeck(self):
+    def oeCreateDeck(self):
 
         self.isShuffled = False
         
@@ -56,25 +56,25 @@ class Deck:
         
         self.total_deck = self.deck
 
-    def shuffleDeck(self):
+    def oeShuffleDeck(self):
         self.isShuffled = True
         rd.shuffle(self.deck)
     
     
-    def printDeck(self):
+    def oePrintDeck(self):
         n = 1
         for card in self.deck:
             print(n, card.name)
             n += 1
         
-    def showDeck(self):
+    def oeShowDeck(self):
         for card in self.deck:
             print(card.name)
 
 
 # Class CardUser is the class for player and enemies. A card user has a hand, a deck, health_points and a status.
 # There are the functions showStatus which shows the health and the status and useCard that has 
-class CardUser:
+class ctCardUser:
 
     def __init__(self, health_points):
         self.hand = []
@@ -83,10 +83,10 @@ class CardUser:
         self.status_effect = None
         self.isDead = False
     
-    def showStatus(self):
+    def oeShowStatus(self):
         pass
 
-    def useCard(self, card, target):
+    def ugUseCard(self, card, target):
 
         if card not in self.hand:
             return "--- Not in hand ---"
@@ -97,60 +97,60 @@ class CardUser:
         if target is None:
             return "--- No target Selected ---"
 
-        self.applyCardEffect(card, target)
-        self.removeCardFromHand(card)
+        self.oeApplyCardEffect(card, target)
+        self.oeRemoveCardFromHand(card)
 
         return f"--- Card Effect applied --- \n --- {card.text} ---"
 
-    def applyCardEffect(self, card, target):
+    def oeApplyCardEffect(self, card, target):
         health_effect = card.health_effect
         status_effect = card.status_effect
 
         target.health_points += health_effect
         target.status_effect = status_effect
     
-    def removeCardFromHand(self, card):
+    def oeRemoveCardFromHand(self, card):
         self.hand.remove(card)
 
-    def drawCard(self, number):
+    def oeDrawCard(self, number):
 
         for _ in range(number):
             self.hand.append(self.deck.deck[0])
             self.deck.deck = self.deck.deck[1:]
         
-    def showHand(self):
+    def oeShowHand(self):
 
         for card in self.hand:
             print(f"--- {card.name} ---")
 
-    def showDeck(self):
+    def oeShowDeck(self):
 
         self.deck.showDeck()
 
 # Class Player inherits from CardUser, however here with have a set health_points value
-class Player(CardUser):
+class ctPlayer(ctCardUser):
     
     def __init__(self, tries):
         super().__init__(health_points= 20)
-        self.isFightingAgainstEnemy = False
+        self.isFightingEnemy = False
         self.tries = tries
     
-    def giveDeck(self, deck):
+    def oeGiveDeck(self, deck):
         self.deck = deck
 
    
 
 
 # Class Enemy inherist from CardUser
-class Enemy(CardUser):
+class ctEnemy(ctCardUser):
 
     def __init__(self, health_points):
         super().__init__(health_points)
-        self.isFightingAgainstPlayer = False
+        self.isFightingPlayer = False
     
 
 
-class Admin:
+class ctAdmin:
     pass
 
 
@@ -171,18 +171,18 @@ class Game:
         self.isFightStarted = False
         self.isPlayerCreated = False
         self.isTypeUser = False
-        self.commands = dict()
+        #self.commands = dict()
 
         self.offensive_cards_dic = {
-            0: Card("FireBall", "offensive", -5, "burn", "Inflict 5 damages to the targeted entity"),
-            1: Card("Ice Spike", "offensive", -3, "freeze", "Inflict 3 damage to targeted entity"),
-            2: Card("Burn", "offensive", 0, "burn", "Inflict burning effect to the target") 
+            0: ctCard("FireBall", "offensive", -5, "burn", "Inflict 5 damages to the targeted entity"),
+            1: ctCard("Ice Spike", "offensive", -3, "freeze", "Inflict 3 damage to targeted entity"),
+            2: ctCard("Burn", "offensive", 0, "burn", "Inflict burning effect to the target") 
         }
 
         self.defensive_cards_dic = {
-            0: Card("Heal", "defensive", +5, None, "Heal 5 health points to target"),
-            1: Card("Block", "defensive", 6, "prevent", "Prevent next turn damage"),
-            2: Card("Blessing", "defensive", 0, "bless", "Next healing will be doubled")
+            0: ctCard("Heal", "defensive", +5, None, "Heal 5 health points to target"),
+            1: ctCard("Block", "defensive", 6, "prevent", "Prevent next turn damage"),
+            2: ctCard("Blessing", "defensive", 0, "bless", "Next healing will be doubled")
         }
 
 
@@ -199,7 +199,7 @@ class Game:
             command = input("--- Type your command --- ")
 
             if command == 'player':
-                player = Player(tries= 3)
+                player = ctPlayer(tries= 3)
                 self.isPlayerCreated = True
                 self.isTypeUser = True
             elif command == 'admin':
@@ -213,7 +213,7 @@ class Game:
 
             self.commandHandler(command, player)
 
-
+    #Handles the different command that the user can enter in the terminal
     def commandHandler(self, command, player):
         command = command.split(' ')
 
@@ -224,22 +224,27 @@ class Game:
             print("--- createDeck: creates a deck of random cards taken from the card pool ---")
             print("--- showDeck: shows the cards in the deck --- ")
             print("--- shuffleDeck: shuffles the deck --- ")
+            print("--- startGame: starts the game ---")
+            print("--- startFight: starts a fight agains the enemy of the floor ---")
+            print("--- showHand: shows the cards in hand ---")
+            print("--- describeCard cardname: describes the effect of the card ---")
+            print("--- useCard cardname target: applies the card effect to the targeted card user ---")
             print("--- quit: quit the software --- ")
         elif command[0] == 'createDeck':
-            deck = Deck(self.offensive_cards_dic, self.defensive_cards_dic)
-            deck.createDeck()
-            player.giveDeck(deck)
+            deck = ctDeck(self.offensive_cards_dic, self.defensive_cards_dic)
+            deck.oeCreateDeck()
+            player.oeGiveDeck(deck)
             print("--- Deck Created! --- ")
             self.isDeckCreated = True
         elif command[0] == 'showDeck':
             if self.isDeckCreated:
                 print("--- Deck contains --- ")
-                player.deck.printDeck()
+                player.deck.oePrintDeck()
             else:
                 print('--- Deck not created! --- ')
         elif command[0] == 'shuffleDeck':
             if self.isDeckCreated:
-                player.deck.shuffleDeck()
+                player.deck.oeShuffleDeck()
                 self.isDeckShuffled = True
                 print('--- Deck succesfuly shuffled! --- ')
             else:
@@ -254,8 +259,21 @@ class Game:
                 print("--- Game can't be started ---")
         elif command[0] == 'describeCard':
             try: 
-                asked_card_name = command[1]
-                set_of_cards = set(player.deck.deck)
+                card_name = command[1]
+
+                for card in player.deck.total_deck:
+                    if card.name == card_name:
+                        card_used = card
+                    else:
+                        card_used = None
+                        
+                
+                if card_used is not None:
+                
+                    card.oeDescribeCard()
+                else:
+                    print("--- Card not in deck ---")
+                        
                 
             except:
                 print("--- no card given ---")
@@ -263,8 +281,9 @@ class Game:
             if self.isDeckCreated and self.isDeckShuffled and self.isPlayerCreated and self.isGameStarted and not self.isFightStarted:
 
                 self.isFightStarted = True
-                self.startFight(player, self.enemies[self.current_floor])
                 print("--- Fight Started ! ---")
+                self.startFight(player, self.enemies[self.current_floor])
+                
                 
         elif command[0] == 'useCard':
             if self.isDeckCreated and self.isDeckShuffled and self.isPlayerCreated and self.isGameStarted and self.isFightStarted: 
@@ -284,37 +303,37 @@ class Game:
                 else:
                     target = None
 
-                message = player.useCard(card_used, target)
+                message = player.ugUseCard(card_used, target)
                 print(message)
         elif command[0] == 'showHand':
             if self.isDeckCreated and self.isDeckShuffled and self.isPlayerCreated and self.isGameStarted and self.isFightStarted:
                 print("--- The cards in your hand are: ---")
-                player.showHand()
+                player.oeShowHand()
         else:
             print("--- Unknown Command. Try again! --- ")
 
 
     def createEnemies(self):
 
-        enemy0 = Enemy(10)
+        enemy0 = ctEnemy(10)
         self.enemies.append(enemy0)
     
-    
+    #Handles a fight against an enemy
     def startFight(self, player, enemy):
-        player.isFightingAgainstEnemy = True
-        enemy.isFightingAgainstPlayer = True
+        player.isFightingEnemy = True
+        enemy.isFightingPlayer = True
 
-        player.drawCard(5)
+        player.oeDrawCard(5)
         self.current_enemy = enemy
 
-        while player.isFightingAgainstEnemy and enemy.isFightingAgainstPlayer:
+        while player.isFightingEnemy and enemy.isFightingPlayer and not self.quit:
 
             command = input("--- Type your command --- ")
             self.commandHandler(command, player)
 
             if player.health_points <= 0 or enemy.health_points <= 0:
-                player.isFightingAgainstEnemy = False
-                enemy.isFightingAgainstPlayer = False
+                player.isFightingEnemy = False
+                enemy.isFightingPlayer = False
 
 
         
