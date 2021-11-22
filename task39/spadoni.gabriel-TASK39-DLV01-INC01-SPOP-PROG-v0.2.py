@@ -1,8 +1,8 @@
 """
-8/11/2021 - Time:
+22/11/2021 - Time:
 Gabriel S.J. Spadoni
-spadoni.gabriel-TASK31-DLV01-INC01-SPOP-PROG-v0.1
-This product is the first version of the python program of the SPOP (Small Proprietary Original Project). 
+spadoni.gabriel-TASK39-DLV01-INC01-SPOP-PROG-v0.2
+This product is the second version of the python program of the SPOP (Small Proprietary Original Project). 
 The SPOP is a simple one player game with fantasy elements. In this game, the user plays with a random 
 generated deck of 20 offensive and defensive cards. The player starts at the first floor of a dungeon and 
 will try to climb it. Each floor is constituted of one fight against an enemy. The enemy will attack and 
@@ -36,6 +36,7 @@ class Deck:
         self.offensive_cards = offensive_cards
         self.defensive_cards = defensive_cards
         self.deck = []
+        self.total_deck = []
         self.max_cards = max_cards
         self.isShuffled = False
 
@@ -52,6 +53,8 @@ class Deck:
         for _ in range(n_defensive_cards):
             card = self.defensive_cards[rd.randint(0, len(self.defensive_cards) - 1)]
             self.deck.append(card)
+        
+        self.total_deck = self.deck
 
     def shuffleDeck(self):
         self.isShuffled = True
@@ -65,7 +68,9 @@ class Deck:
             n += 1
         
     def showDeck(self):
-        pass
+        for card in self.deck:
+            print(card.name)
+
 
 # Class CardUser is the class for player and enemies. A card user has a hand, a deck, health_points and a status.
 # There are the functions showStatus which shows the health and the status and useCard that has 
@@ -88,11 +93,14 @@ class CardUser:
 
         if self.status_effect == 'freeze':
             return "-- You are frozen ---"
+        
+        if target is None:
+            return "--- No target Selected ---"
 
         self.applyCardEffect(card, target)
         self.removeCardFromHand(card)
 
-        return "--- Card Effect applied ---"
+        return f"--- Card Effect applied --- \n --- {card.text} ---"
 
     def applyCardEffect(self, card, target):
         health_effect = card.health_effect
@@ -104,6 +112,20 @@ class CardUser:
     def removeCardFromHand(self, card):
         self.hand.remove(card)
 
+    def drawCard(self, number):
+
+        for _ in range(number):
+            self.hand.append(self.deck.deck[0])
+            self.deck.deck = self.deck.deck[1:]
+        
+    def showHand(self):
+
+        for card in self.hand:
+            print(f"--- {card.name} ---")
+
+    def showDeck(self):
+
+        self.deck.showDeck()
 
 # Class Player inherits from CardUser, however here with have a set health_points value
 class Player(CardUser):
@@ -189,76 +211,89 @@ class Game:
             
             command = input("--- Type your command --- ")
 
-            command = command.split(' ')
+            self.commandHandler(command, player)
 
 
-            if command[0] == 'quit':
-                self.quit = True
-            elif command[0] == 'help':
-                print("--- Commands are: ---")
-                print("--- createDeck: creates a deck of random cards taken from the card pool ---")
-                print("--- showDeck: shows the cards in the deck --- ")
-                print("--- shuffleDeck: shuffles the deck --- ")
-                print("--- quit: quit the software --- ")
-            elif command[0] == 'createDeck':
-                deck = Deck(self.offensive_cards_dic, self.defensive_cards_dic)
-                deck.createDeck()
-                print("--- Deck Created! --- ")
-                self.isDeckCreated = True
-            elif command[0] == 'showDeck':
-                if self.isDeckCreated:
-                    print("--- Deck contains --- ")
-                    deck.printDeck()
-                else:
-                    print('--- Deck not created! --- ')
-            elif command[0] == 'shuffleDeck':
-                if self.isDeckCreated:
-                    deck.shuffleDeck()
-                    self.isDeckShuffled = True
-                    print('--- Deck succesfuly shuffled! --- ')
-                else:
-                    print('--- Deck not created! --- ')
-            elif command[0] == 'startGame':
-                if self.isDeckCreated and self.isDeckShuffled and self.isPlayerCreated:
-                    self.createEnemies()
-                    player.giveDeck(deck)
-                    print('--- The game has started! --- ')
-                    self.isGameStarted = True
-                else:
-                    print("--- Game can't be started ---")
-            elif command[0] == 'describeCard':
-                try: 
-                    asked_card_name = command[1]
-                    set_of_cards = set(player.deck.deck)
-                    
-                except:
-                    print("--- no card given ---")
-            elif command[0] == 'startFight':
-                if self.isDeckCreated and self.isDeckShuffled and self.isPlayerCreated and self.isGameStarted:
-                    self.startFight(player, self.enemies[self.current_floor])
-                    print("--- Fight Started ! ---")
-                    self.isFightStarted = True
-            elif command[0] == 'useCard':
-                if self.isDeckCreated and self.isDeckShuffled and self.isPlayerCreated and self.isGameStarted and self.isFightStarted: 
-                    card_name = command[1]
-                    target_name = command[2]
+    def commandHandler(self, command, player):
+        command = command.split(' ')
 
-                    for card in player.deck:
-                        if card.name == card_name:
-                            card_used = card
-                    
-                    if target_name == 'enemy':
-                        target = self.current_enemy
-                    elif target_name == 'player':
-                        target = player
-
-                    message = player.useCard(card_used, target)
-                    print(message)
-
+        if command[0] == 'quit':
+            self.quit = True
+        elif command[0] == 'help':
+            print("--- Commands are: ---")
+            print("--- createDeck: creates a deck of random cards taken from the card pool ---")
+            print("--- showDeck: shows the cards in the deck --- ")
+            print("--- shuffleDeck: shuffles the deck --- ")
+            print("--- quit: quit the software --- ")
+        elif command[0] == 'createDeck':
+            deck = Deck(self.offensive_cards_dic, self.defensive_cards_dic)
+            deck.createDeck()
+            player.giveDeck(deck)
+            print("--- Deck Created! --- ")
+            self.isDeckCreated = True
+        elif command[0] == 'showDeck':
+            if self.isDeckCreated:
+                print("--- Deck contains --- ")
+                player.deck.printDeck()
             else:
-                print("--- Unknown Command. Try again! --- ")
-            
-    
+                print('--- Deck not created! --- ')
+        elif command[0] == 'shuffleDeck':
+            if self.isDeckCreated:
+                player.deck.shuffleDeck()
+                self.isDeckShuffled = True
+                print('--- Deck succesfuly shuffled! --- ')
+            else:
+                print('--- Deck not created! --- ')
+        elif command[0] == 'startGame':
+            if self.isDeckCreated and self.isDeckShuffled and self.isPlayerCreated and not self.isGameStarted:
+                self.createEnemies()
+                
+                print('--- The game has started! --- ')
+                self.isGameStarted = True
+            else:
+                print("--- Game can't be started ---")
+        elif command[0] == 'describeCard':
+            try: 
+                asked_card_name = command[1]
+                set_of_cards = set(player.deck.deck)
+                
+            except:
+                print("--- no card given ---")
+        elif command[0] == 'startFight':
+            if self.isDeckCreated and self.isDeckShuffled and self.isPlayerCreated and self.isGameStarted and not self.isFightStarted:
+
+                self.isFightStarted = True
+                self.startFight(player, self.enemies[self.current_floor])
+                print("--- Fight Started ! ---")
+                
+        elif command[0] == 'useCard':
+            if self.isDeckCreated and self.isDeckShuffled and self.isPlayerCreated and self.isGameStarted and self.isFightStarted: 
+                card_name = command[1]
+                target_name = command[2]
+
+                for card in player.deck.total_deck:
+                    if card.name == card_name:
+                        card_used = card
+                    else:
+                        card_used = None
+                
+                if target_name == 'enemy':
+                    target = self.current_enemy
+                elif target_name == 'player':
+                    target = player
+                else:
+                    target = None
+
+                message = player.useCard(card_used, target)
+                print(message)
+        elif command[0] == 'showHand':
+            if self.isDeckCreated and self.isDeckShuffled and self.isPlayerCreated and self.isGameStarted and self.isFightStarted:
+                print("--- The cards in your hand are: ---")
+                player.showHand()
+        else:
+            print("--- Unknown Command. Try again! --- ")
+
+
     def createEnemies(self):
 
         enemy0 = Enemy(10)
@@ -269,10 +304,20 @@ class Game:
         player.isFightingAgainstEnemy = True
         enemy.isFightingAgainstPlayer = True
 
+        player.drawCard(5)
         self.current_enemy = enemy
 
+        while player.isFightingAgainstEnemy and enemy.isFightingAgainstPlayer:
+
+            command = input("--- Type your command --- ")
+            self.commandHandler(command, player)
+
+            if player.health_points <= 0 or enemy.health_points <= 0:
+                player.isFightingAgainstEnemy = False
+                enemy.isFightingAgainstPlayer = False
 
 
+        
 game = Game()
 
 game.main()
