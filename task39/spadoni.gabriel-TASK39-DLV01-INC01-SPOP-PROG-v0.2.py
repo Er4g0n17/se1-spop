@@ -36,7 +36,7 @@ class ctDeck:
         self.offensive_cards = offensive_cards
         self.defensive_cards = defensive_cards
         self.deck = []
-        self.total_deck = []
+        self.total_deck = ()
         self.max_cards = max_cards
         self.isShuffled = False
 
@@ -54,7 +54,7 @@ class ctDeck:
             card = self.defensive_cards[rd.randint(0, len(self.defensive_cards) - 1)]
             self.deck.append(card)
         
-        self.total_deck = self.deck
+        self.total_deck = tuple(self.deck)
 
     def oeShuffleDeck(self):
         self.isShuffled = True
@@ -175,7 +175,7 @@ class Game:
 
         self.offensive_cards_dic = {
             0: ctCard("FireBall", "offensive", -5, "burn", "Inflict 5 damages to the targeted entity"),
-            1: ctCard("Ice Spike", "offensive", -3, "freeze", "Inflict 3 damage to targeted entity"),
+            1: ctCard("IceSSpike", "offensive", -3, "freeze", "Inflict 3 damage to targeted entity"),
             2: ctCard("Burn", "offensive", 0, "burn", "Inflict burning effect to the target") 
         }
 
@@ -264,6 +264,7 @@ class Game:
                 for card in player.deck.total_deck:
                     if card.name == card_name:
                         card_used = card
+                        break
                     else:
                         card_used = None
                         
@@ -293,6 +294,7 @@ class Game:
                 for card in player.deck.total_deck:
                     if card.name == card_name:
                         card_used = card
+                        break
                     else:
                         card_used = None
                 
@@ -312,6 +314,7 @@ class Game:
         else:
             print("--- Unknown Command. Try again! --- ")
 
+        return command[0]
 
     def createEnemies(self):
 
