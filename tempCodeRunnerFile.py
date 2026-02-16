@@ -1,2 +1,0 @@
-
-            self.deck.append(card)
