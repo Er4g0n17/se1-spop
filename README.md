@@ -1,0 +1,1 @@
+Both the folder task31 and task39 contain the version 0.1 and 0.2 of a program called SPOP made in the context of a course in the BiCS. This program is a small game with fantasy elements where the players need to beat a dungeon using card game mechanics.
